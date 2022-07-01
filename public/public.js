@@ -1,7 +1,7 @@
 const socket = io();
 const form = document.querySelector('#formulario');
 const formChat = document.querySelector('#formMessages');
-console.log(form)
+\
 const renderProductos = async (data) => {
     const template = await fetch('/plantilla/tabla.hbs');
     const textTemplate = await template.text();

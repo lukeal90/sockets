@@ -5,7 +5,7 @@ const pathFile = path.resolve(__dirname, "../../public/chat.json");
 
 class ChatController {
 
-    static async save(req, res) {
+    static async save(data) {
         try {
                 const chats = await this.getAll();
                 let id = 1;
@@ -14,13 +14,9 @@ class ChatController {
                     id = parseInt(chats[chats.length - 1].id) + 1;
                 }
         
-                const newChat = {...req.body, id: id}
+                const newChat = {...data, id: id}
                 chats.push(newChat);
-                await fs.writeFile(pathFile, JSON.stringify(chats));
-                return {
-                        "msg" : `Se agrego el producto con el ID: ${id}`,
-                        "status" : "ok"
-                    };   
+                await fs.writeFile(pathFile, JSON.stringify(chats)); 
         } catch (error) {
             console.log("Algo salio mal al obtener los chats : " + error.message);
         }
