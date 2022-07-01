@@ -5,10 +5,9 @@ class ProductController {
     static async getAll(req, res) {
         try {
             let productos = await ProductService.getAll();
-            res.render('productos', {productos: productos, cantidad: productos.length});
-
+            return productos;
         } catch (error) {
-            console.log("Algo salio mal al obtener los productos : " + error.message);
+            return [];
         }
     }
 
@@ -36,14 +35,9 @@ class ProductController {
         }
     }
 
-    static async addProduct(req, res) {
+    static async addProduct(data) {
         try {
-            let response = await ProductService.addProduct(req.body);
-
-            if(response.status == "ok"){
-                res.redirect("/");
-            }
-
+            let response = await ProductService.addProduct(data);
         } catch (error) {
             console.log("Algo salio mal al obtener los productos : " + error.message);
         }

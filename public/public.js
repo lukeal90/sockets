@@ -1,7 +1,7 @@
-const socket = this.io();
+const socket = io();
 const form = document.querySelector('#formulario');
 const formChat = document.querySelector('#formMessages');
-
+console.log(form)
 const renderProductos = async (data) => {
     const template = await fetch('/plantilla/tabla.hbs');
     const textTemplate = await template.text();
@@ -19,6 +19,7 @@ const renderChat = async (data) => {
 }
 
 form.addEventListener('submit', async (e) => {
+    console.log("entro")
     e.preventDefault();
     const formData = new FormData(form);
     const newProducto = {

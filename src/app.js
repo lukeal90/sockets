@@ -7,9 +7,10 @@ const path = require('path');
 const logger = require('./helpers/logger');
 const Router = require('./routes');
 const packageJson = require('../package.json');
-const { engine } = require('express-handlebars');
 const { Server: HttpServer } = require('http')
 const { Server: IOServer } = require('socket.io')
+const { ProductController } = require('./controllers');
+const { ChatController } = require('./controllers');
 
 const {
     BODY_LIMIT,
@@ -34,14 +35,15 @@ class App {
     }
 
     _configure() {
+        this._webSocket();
         this._middleWares();
         return this._routes();
     }
 
     _middleWares() {
-        this.app.engine('handlebars', engine());
-        this.app.set('view engine', 'handlebars');
-        this.app.set('views', './src/views');
+        // this.app.engine('handlebars', engine());
+        // this.app.set('view engine', 'handlebars');
+        // this.app.set('views', './src/views');
         this.app.use(bodyParser.json({limit: BODY_LIMIT}));
         this.app.use(bodyParser.urlencoded({extended: true}));
         this.app.use(express.static(path.resolve('public')));
@@ -55,23 +57,23 @@ class App {
     }
 
     _webSocket() {
-        io.on('connection', async (socket) => {
+        this.io.on('connection', async (socket) => {
             console.log('Un cliente se ha conectado');
-            const productos = await producto.getAll();
+            const productos = await ProductController.getAll();
             socket.emit('productos', productos);
         
-            const messages = await chat.getAll();
+            const messages = await ChatController.getAll();
             socket.emit('messages', messages);
         
             socket.on('new-producto', async (data) => {
-                const idNuevoProducto = await producto.save(data);
-                const productos = await producto.getAll();
-                io.sockets.emit('productos', productos);
+                const idNuevoProducto = await ProductController.addProduct(data);
+                const productos = await ProductController.getAll();
+                this.io.sockets.emit('productos', productos);
             });
             socket.on('new-message', async (data) => {
-                const nuevoM = await chat.save(data);
-                const messages = await chat.getAll();
-                io.sockets.emit('messages', messages);
+                const nuevoM = await ChatController.save(data);
+                const messages = await ChatController.getAll();
+                this.io.sockets.emit('messages', messages);
             });
         });
     }
